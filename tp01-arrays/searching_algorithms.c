@@ -1,3 +1,8 @@
+// Note: A larger array would provide more significant execution-time
+// differences. For practical testing, n is set to 1000 to keep memory
+// usage reasonable. Consequently, the measured execution times may
+// be too small to demonstrate the differences clearly.
+
 #include<stdio.h>
 #include<time.h>
 #include<stdlib.h>
@@ -83,6 +88,58 @@ if(found){
 }else printf("value not found\n");
 printf("execution time for binary search is : %.9f seconds\n",elapsed);
 
+//indexed sequential search 
+//devide the array to 100 blocks
+int numBlocks = 100;
+int blockSize = n / numBlocks;
+//store the last element of each block in an array
+int *index = malloc(numBlocks * sizeof(int));
+//check allocation
+if(index==NULL){
+    printf("allocation failed");
+    free(A);
+    return 1;
+}
+//fill the array
+int j;
+for(i=0;i<numBlocks;i++){
+  j=(i + 1) * blockSize - 1;
+  index[i]=A[j];
+
+}
+start = clock();
+//finding the right block where val belongs
+int block = 0;
+while (block<numBlocks && index[block]<val)
+{
+    block++;//index of first value bigger or equal to val
+}
+//searching sequentially in the chosen block
+found=false;
+if(block <numBlocks){
+int last = (block+1)*blockSize -1;
+int first=last - blockSize+1;
+
+i=first;
+
+while (i<=last && !found )
+{
+    if (A[i]==val){
+        found=true;
+    }
+    i++;
+}
+}
+end=clock();
+elapsed=(double)(end - start)/CLOCKS_PER_SEC;
+
+if(found==false){
+    printf("value not  found\n");
+}else printf("value found\n ");
+
+printf("execution time for indexed sequential search is : %.9f seconds\n",elapsed);
+
+free(index);
 free(A);
     return 0;
 }
